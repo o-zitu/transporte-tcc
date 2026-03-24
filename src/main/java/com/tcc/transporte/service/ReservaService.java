@@ -36,9 +36,9 @@ public class ReservaService {
                         StatusReserva.ATIVA
                 );
 
-        //if (usuarioJaReservou) {
-        //    throw new RuntimeException("Usuário já possui reserva ativa nesse ônibus!");
-        //}
+        if (usuarioJaReservou) {
+            throw new RuntimeException("Usuário já possui reserva ativa nesse ônibus!");
+        }
 
         reserva.setDataReserva(LocalDateTime.now());
 
