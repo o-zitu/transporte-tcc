@@ -8,6 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/onibus")
+@CrossOrigin(origins = "*")
 public class OnibusController {
 
     private final OnibusService onibusService;

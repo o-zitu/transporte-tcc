@@ -36,11 +36,13 @@ public class ReservaService {
                         StatusReserva.ATIVA
                 );
 
-        if (usuarioJaReservou) {
-            throw new RuntimeException("Usuário já possui reserva ativa nesse ônibus!");
-        }
+        //if (usuarioJaReservou) {
+        //    throw new RuntimeException("Usuário já possui reserva ativa nesse ônibus!");
+        //}
 
         reserva.setDataReserva(LocalDateTime.now());
+
+        reserva.setStatus(StatusReserva.ATIVA);
 
         return reservaRepository.save(reserva);
     }
@@ -57,4 +59,6 @@ public class ReservaService {
 
         reservaRepository.deleteById(id);
     }
+
+
 }

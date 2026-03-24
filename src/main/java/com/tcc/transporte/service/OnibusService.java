@@ -2,6 +2,7 @@ package com.tcc.transporte.service;
 
 import com.tcc.transporte.model.entity.Onibus;
 import com.tcc.transporte.model.entity.Reserva;
+import com.tcc.transporte.model.enums.StatusReserva;
 import com.tcc.transporte.repository.OnibusRepository;
 import com.tcc.transporte.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,15 @@ public class OnibusService {
 
     public List<Integer> listarAssentosOcupados(Long onibusId) {
 
-        List<Reserva> reservas = reservaRepository.findByOnibusId(onibusId);
+        List<Reserva> reservas = reservaRepository
+                .findByOnibus_IdAndStatus(onibusId, StatusReserva.ATIVA);
 
         return reservas
                 .stream()
-                .map(reserva -> reserva.getNumeroAssento())
-                .collect(Collectors.toList());
+                .map(Reserva::getNumeroAssento)
+                .toList();
     }
+
+
 
 }

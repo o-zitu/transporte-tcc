@@ -12,5 +12,5 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     boolean existsByUsuarioIdAndOnibusIdAndStatus(Long usuarioId, Long onibusId, StatusReserva status);
 
-    List<Reserva> findByOnibusId(Long onibusId);
+    List<Reserva> findByOnibus_IdAndStatus(Long onibusId, StatusReserva status);
 }
