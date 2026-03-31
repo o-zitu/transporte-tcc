@@ -30,5 +30,14 @@ public class ReservaController {
     public void cancelarReserva(@PathVariable Long id) {
         reservaService.cancelarReserva(id);
     }
+    @DeleteMapping
+    public void deletarTodas() {
+        reservaService.deletarTodas();
+    }
+
+    @GetMapping("/onibus/{id}")
+    public List<Reserva> listarPorOnibus(@PathVariable Long id) {
+        return reservaService.listarPorOnibus(id);
+    }
 
 }

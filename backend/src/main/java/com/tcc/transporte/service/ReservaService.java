@@ -60,5 +60,13 @@ public class ReservaService {
         reservaRepository.deleteById(id);
     }
 
+    public void deletarTodas() {
+        reservaRepository.deleteAll();
+    }
+
+    public List<Reserva> listarPorOnibus(Long id) {
+        return reservaRepository.findByOnibusId(id);
+    }
+
 
 }
