@@ -1,6 +1,7 @@
 package com.tcc.transporte.service;
 
 import com.tcc.transporte.model.entity.Usuario;
+import com.tcc.transporte.model.enums.Role;
 import com.tcc.transporte.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,5 +24,10 @@ public class AuthService {
         }
 
         return usuario;
+    }
+
+    public Usuario register(Usuario usuario) {
+        usuario.setRole(Role.PASSAGEIRO);
+        return usuarioRepository.save(usuario);
     }
 }

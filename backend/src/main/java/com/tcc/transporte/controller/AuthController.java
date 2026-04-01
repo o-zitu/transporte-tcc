@@ -15,10 +15,19 @@ public class AuthController {
         this.authService = authService;
     }
 
+
     @PostMapping("/login")
     public Usuario login(@RequestBody Usuario request) {
         Usuario usuario = authService.login(request.getEmail(), request.getSenha());
         usuario.setSenha(null);
         return usuario;
+    }
+
+
+    @PostMapping("/register")
+    public Usuario register(@RequestBody Usuario usuario) {
+        Usuario novo = authService.register(usuario);
+        novo.setSenha(null);
+        return novo;
     }
 }
