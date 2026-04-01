@@ -1,42 +1,25 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 function App() {
   const [onibus, setOnibus] = useState([]);
   const [onibusSelecionado, setOnibusSelecionado] = useState(null);
   const [assentosOcupados, setAssentosOcupados] = useState([]);
-  const [reservas, setReservas] = useState([]);
+  const [minhasReservas, setMinhasReservas] = useState([]);
 
-  const navigate = useNavigate();
-
+  // 🔥 pega usuário logado
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-  // 🔥 proteção básica
-  useEffect(() => {
-    if (!usuario) {
-      navigate("/");
-    }
-  }, []);
+  // 🔥 segurança básica (se não tiver logado)
+  if (!usuario) {
+    window.location.href = "/";
+    return null;
+  }
 
   // 🔥 carregar ônibus
   useEffect(() => {
     fetch("http://localhost:8080/onibus")
       .then(res => res.json())
       .then(data => setOnibus(data));
-  }, []);
-
-  // 🔥 carregar reservas do usuário
-  const carregarReservas = () => {
-    fetch("http://localhost:8080/reservas")
-      .then(res => res.json())
-      .then(data => {
-        const minhas = data.filter(r => r.usuario?.id === usuario?.id);
-        setReservas(minhas);
-      });
-  };
-
-  useEffect(() => {
-    if (usuario) carregarReservas();
   }, []);
 
   // 🔥 buscar assentos ocupados
@@ -46,13 +29,24 @@ function App() {
       .then(data => setAssentosOcupados(data.map(Number)));
   };
 
+  // 🔥 buscar minhas reservas
+  const buscarMinhasReservas = () => {
+    fetch("http://localhost:8080/reservas")
+      .then(res => res.json())
+      .then(data => {
+        const minhas = data.filter(r => r.usuario?.id === usuario.id);
+        setMinhasReservas(minhas);
+      });
+  };
+
   // 🔥 selecionar ônibus
   const selecionarOnibus = (bus) => {
     setOnibusSelecionado(bus);
     buscarAssentos(bus.id);
+    buscarMinhasReservas();
   };
 
-  // 🔥 reservar
+  // 🔥 reservar assento
   const reservarAssento = (numero) => {
     fetch("http://localhost:8080/reservas", {
       method: "POST",
@@ -62,7 +56,7 @@ function App() {
       body: JSON.stringify({
         numeroAssento: numero,
         status: "ATIVA",
-        usuario: { id: usuario.id },
+        usuario: { id: usuario.id }, // 🔥 AGORA DINÂMICO
         onibus: { id: onibusSelecionado.id }
       })
     })
@@ -73,9 +67,9 @@ function App() {
         return res.json();
       })
       .then(() => {
-        alert("Reservado!");
+        alert("Reservado 😎");
         buscarAssentos(onibusSelecionado.id);
-        carregarReservas();
+        buscarMinhasReservas();
       })
       .catch(err => alert(err.message));
   };
@@ -86,25 +80,23 @@ function App() {
       method: "DELETE"
     })
       .then(() => {
-        alert("Cancelado!");
-        carregarReservas();
-        if (onibusSelecionado) {
-          buscarAssentos(onibusSelecionado.id);
-        }
+        alert("Cancelado 👍");
+        buscarAssentos(onibusSelecionado.id);
+        buscarMinhasReservas();
       });
   };
 
   // 🔥 logout
   const logout = () => {
     localStorage.removeItem("usuario");
-    navigate("/");
+    window.location.href = "/";
   };
 
   // 🔥 tela de assentos
   if (onibusSelecionado) {
     return (
       <div style={styles.container}>
-        <h1>Assentos do ônibus {onibusSelecionado.nome}</h1>
+        <h1>Ônibus {onibusSelecionado.nome}</h1>
 
         <button onClick={() => setOnibusSelecionado(null)}>
           Voltar
@@ -113,7 +105,6 @@ function App() {
         <div style={styles.grid}>
           {[...Array(onibusSelecionado.quantidadeAssentos)].map((_, i) => {
             const numero = i + 1;
-
             const ocupado = assentosOcupados.includes(numero);
 
             return (
@@ -130,11 +121,22 @@ function App() {
             );
           })}
         </div>
+
+        <h2>Minhas Reservas</h2>
+
+        {minhasReservas.map(r => (
+          <div key={r.id}>
+            Assento {r.numeroAssento}
+            <button onClick={() => cancelarReserva(r.id)}>
+              Cancelar
+            </button>
+          </div>
+        ))}
       </div>
     );
   }
 
-  // 🔥 tela principal
+  // 🔥 tela inicial
   return (
     <div style={styles.container}>
       <h1>Ônibus disponíveis</h1>
@@ -152,21 +154,11 @@ function App() {
           <p>Assentos: {bus.quantidadeAssentos}</p>
         </div>
       ))}
-
-      <h2>Minhas Reservas</h2>
-
-      {reservas.map(r => (
-        <div key={r.id} style={{ margin: "10px" }}>
-          Assento {r.numeroAssento}
-          <button onClick={() => cancelarReserva(r.id)}>
-            Cancelar
-          </button>
-        </div>
-      ))}
     </div>
   );
 }
 
+// 🎨 estilos básicos
 const styles = {
   container: {
     textAlign: "center",
