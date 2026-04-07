@@ -27,4 +27,13 @@ public class OnibusController {
         return onibusService.listarAssentosOcupados(id);
     }
 
+    @PostMapping
+    public Onibus criarOnibus(@RequestBody Onibus onibus) {
+        return onibusService.salvar(onibus);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deletarOnibus(@PathVariable Long id) {
+        onibusService.deletar(id);
+    }
 }

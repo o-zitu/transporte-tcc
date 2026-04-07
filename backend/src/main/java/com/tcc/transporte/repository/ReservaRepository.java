@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
+    void deleteByOnibusId(Long onibusId);
+
 
     boolean existsByNumeroAssentoAndOnibusId(Integer numeroAssento, Long onibusId);
 
@@ -15,4 +17,5 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByOnibus_IdAndStatus(Long onibusId, StatusReserva status);
 
     List<Reserva> findByOnibusId(Long id);
+
 }
