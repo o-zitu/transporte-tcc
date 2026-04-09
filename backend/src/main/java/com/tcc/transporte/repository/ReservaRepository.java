@@ -9,6 +9,8 @@ import java.util.List;
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     void deleteByOnibusId(Long onibusId);
 
+    void deleteByUsuario_Id(Long usuarioId);
+
 
     boolean existsByNumeroAssentoAndOnibusId(Integer numeroAssento, Long onibusId);
 
@@ -17,5 +19,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByOnibus_IdAndStatus(Long onibusId, StatusReserva status);
 
     List<Reserva> findByOnibusId(Long id);
+
+
 
 }

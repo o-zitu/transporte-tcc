@@ -27,7 +27,10 @@ public class AuthService {
     }
 
     public Usuario register(Usuario usuario) {
-        usuario.setRole(Role.PASSAGEIRO);
+
+        if (usuario.getRole() == null) {
+            usuario.setRole(Role.PASSAGEIRO);
+        }
         return usuarioRepository.save(usuario);
     }
 }
