@@ -1,77 +1,50 @@
-body {
-  background-color: #0f172a;
-  color: white;
-  font-family: Arial, sans-serif;
-  margin: 0;
+/* Layout do Ônibus */
+.bus-container {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 60px 20px 20px 60px; /* Frente arredondada */
+    padding: 40px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin: 20px 0;
 }
 
-/* container geral */
-.container {
-  text-align: center;
-  padding: 20px;
+.steering-wheel {
+    font-size: 40px;
+    opacity: 0.2;
+    transform: rotate(-90deg);
 }
 
-/* botão padrão */
-button {
-  padding: 8px 12px;
-  margin: 4px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
+.seats-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr); /* 10 colunas */
+    gap: 12px;
+    flex-grow: 1;
 }
 
-/* logout */
-.logout {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: #ef4444;
-  color: white;
+/* Legenda */
+.legenda-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
 }
 
-/* botão voltar */
-.voltar {
-  background: #334155;
-  color: white;
+.legenda-item {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #64748b;
 }
 
-/* lista de ônibus */
-.card {
-  background: #1e293b;
-  padding: 15px;
-  margin: 10px auto;
-  width: 250px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.card:hover {
-  transform: scale(1.05);
-}
-
-/* grid de assentos */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(10, 40px);
-  gap: 6px;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-/* assentos */
-.assento {
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
-  color: white;
-}
-
-.livre {
-  background: #22c55e;
-}
-
-.ocupado {
-  background: #ef4444;
+.cor-box {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    margin-right: 8px;
 }

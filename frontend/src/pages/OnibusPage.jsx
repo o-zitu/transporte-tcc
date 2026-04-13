@@ -3,6 +3,7 @@ import "../styles/App.css";
 import ListaOnibus from "../components/ListaOnibus";
 import Assentos from "../components/Assentos";
 import MinhasReservas from "../components/MinhasReservas";
+import MapaPage from "../pages/MapaPage";
 
 function OnibusPage() {
   const [onibus, setOnibus] = useState([]);
@@ -47,9 +48,7 @@ function OnibusPage() {
   const reservar = (numero) => {
     fetch("http://localhost:8080/reservas", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         numeroAssento: numero,
         status: "ATIVA",
@@ -71,43 +70,135 @@ function OnibusPage() {
     });
   };
 
-  // 🔥 TELA INICIAL (LISTA DE ÔNIBUS)
+  // --- ESTILOS ---
+  const styles = {
+    page: {
+      backgroundColor: "#f0f2f5",
+      minHeight: "100vh",
+      fontFamily: "'Segoe UI', Roboto, sans-serif",
+      paddingBottom: "40px"
+    },
+    navbar: {
+      backgroundColor: "#ffffff",
+      padding: "15px 5%",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      marginBottom: "30px"
+    },
+    userName: { color: "#1e293b", fontSize: "14px", fontWeight: "500" },
+    btnLogout: {
+      padding: "8px 16px",
+      backgroundColor: "#fee2e2",
+      color: "#b91c1c",
+      border: "1px solid #fecaca",
+      borderRadius: "6px",
+      cursor: "pointer",
+      fontWeight: "bold"
+    },
+    content: { maxWidth: "1100px", margin: "0 auto", padding: "0 20px" },
+    sectionCard: {
+      backgroundColor: "#ffffff",
+      borderRadius: "12px",
+      padding: "25px",
+      boxShadow: "0 4px 15px rgba(0,0,0,0.05)",
+      marginBottom: "25px"
+    },
+    btnVoltar: {
+      backgroundColor: "#64748b",
+      color: "white",
+      border: "none",
+      padding: "10px 20px",
+      borderRadius: "6px",
+      cursor: "pointer",
+      marginBottom: "20px",
+      fontWeight: "bold"
+    },
+    emptyReservas: {
+      textAlign: "center",
+      color: "#94a3b8",
+      padding: "20px",
+      border: "2px dashed #e2e8f0",
+      borderRadius: "8px"
+    }
+  };
+
+  const Header = () => (
+    <nav style={styles.navbar}>
+      <h2 style={{ color: "#004a87", margin: 0 }}>Voucher System</h2>
+      <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+        <span style={styles.userName}>
+          👤 {usuario?.nome} <span style={{ opacity: 0.6 }}>({usuario?.role})</span>
+        </span>
+        <button onClick={logout} style={styles.btnLogout}>Sair</button>
+      </div>
+    </nav>
+  );
+
+  // --- TELA INICIAL (LISTA + MAPA) ---
   if (!onibusSelecionado) {
     return (
-      <div className="container">
-        <button onClick={logout} className="logout">Sair</button>
-
-        {/* 🔥 AQUI QUE FICA O USUÁRIO */}
-        <p style={{ opacity: 0.7 }}>
-          Logado como: {usuario?.nome} ({usuario?.role})
-        </p>
-
-        <ListaOnibus onibus={onibus} selecionar={selecionarOnibus} />
+      <div style={styles.page}>
+        <Header />
+        <div style={styles.content}>
+          <div style={styles.sectionCard}>
+            <h3 style={{ marginTop: 0, color: "#1e293b" }}>Ônibus Disponíveis</h3>
+            <ListaOnibus onibus={onibus} selecionar={selecionarOnibus} />
+          </div>
+          <div style={styles.sectionCard}>
+            <h3 style={{ color: "#1e293b" }}>Localização em Tempo Real</h3>
+            <div style={{ borderRadius: "8px", overflow: "hidden", border: "1px solid #ddd" }}>
+              <MapaPage />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
-  // 🔥 TELA DE ASSENTOS
+  // --- TELA DE ASSENTOS ---
   return (
-    <div className="container">
-      <button onClick={logout} className="logout">Sair</button>
+    <div style={styles.page}>
+      <Header />
+      <div style={styles.content}>
+        <button onClick={() => setOnibusSelecionado(null)} style={styles.btnVoltar}>
+          ← Voltar para a Lista
+        </button>
 
-      {/* 🔥 TAMBÉM AQUI */}
-      <p style={{ opacity: 0.7 }}>
-        Logado como: {usuario?.nome} ({usuario?.role})
-      </p>
+        <div style={styles.sectionCard}>
+          <h3 style={{ marginTop: 0 }}>Passagem para: {onibusSelecionado.nome}</h3>
+          
+          <div style={{ display: "flex", gap: "15px", marginBottom: "20px", fontSize: "13px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+              <div style={{ width: 12, height: 12, backgroundColor: "#fff", border: "1px solid #ccc" }}></div> Livre
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+              <div style={{ width: 12, height: 12, backgroundColor: "#94a3b8" }}></div> Ocupado
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+              <div style={{ width: 12, height: 12, backgroundColor: "#004a87" }}></div> Selecionado
+            </div>
+          </div>
 
-      <button onClick={() => setOnibusSelecionado(null)} className="voltar">
-        Voltar
-      </button>
+          <Assentos
+            onibus={onibusSelecionado}
+            ocupados={assentosOcupados}
+            reservar={reservar}
+          />
+        </div>
 
-      <Assentos
-        onibus={onibusSelecionado}
-        ocupados={assentosOcupados}
-        reservar={reservar}
-      />
-
-      <MinhasReservas reservas={minhasReservas} cancelar={cancelar} />
+        <div style={styles.sectionCard}>
+          <h3 style={{ marginTop: 0, color: "#1e293b" }}>Minhas Reservas</h3>
+          {minhasReservas.length > 0 ? (
+            <MinhasReservas reservas={minhasReservas} cancelar={cancelar} />
+          ) : (
+            <div style={styles.emptyReservas}>
+              Nenhum assento selecionado ainda. Clique em uma poltrona livre para reservar.
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
