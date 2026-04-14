@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Adicionado o import
 import "../styles/App.css";
 
 function MotoristaPage() {
   const [reservas, setReservas] = useState([]);
+  const navigate = useNavigate(); // Inicializado o navigate
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
+  // --- LOGOUT ATUALIZADO ---
   const logout = () => {
     localStorage.removeItem("usuario");
-    window.location.href = "/";
+    navigate("/login"); // Manda direto para a tela de login
   };
 
   useEffect(() => {
@@ -46,7 +49,7 @@ function MotoristaPage() {
       justifyContent: "space-between",
       alignItems: "center",
       boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-      borderLeft: "5px solid #004a87" // Detalhe em azul para destacar
+      borderLeft: "5px solid #004a87" 
     },
     infoGroup: {
       textAlign: "left"

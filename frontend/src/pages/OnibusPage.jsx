@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Importado useNavigate
 import "../styles/App.css";
 import ListaOnibus from "../components/ListaOnibus";
 import Assentos from "../components/Assentos";
@@ -9,13 +10,16 @@ function OnibusPage() {
   const [onibus, setOnibus] = useState([]);
   const [onibusSelecionado, setOnibusSelecionado] = useState(null);
   const [assentosOcupados, setAssentosOcupados] = useState([]);
+  const [assentosSelecionados, setAssentosSelecionados] = useState([]);
   const [minhasReservas, setMinhasReservas] = useState([]);
 
+  const navigate = useNavigate(); // Inicializado useNavigate
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
+  // --- LOGOUT ATUALIZADO PARA MANDAR PRO LOGIN ---
   const logout = () => {
     localStorage.removeItem("usuario");
-    window.location.href = "/";
+    navigate("/login"); 
   };
 
   useEffect(() => {
@@ -41,11 +45,13 @@ function OnibusPage() {
 
   const selecionarOnibus = (bus) => {
     setOnibusSelecionado(bus);
+    setAssentosSelecionados([]);
     buscarAssentos(bus.id);
     buscarReservas();
   };
 
   const reservar = (numero) => {
+    setAssentosSelecionados([numero]);
     fetch("http://localhost:8080/reservas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -58,6 +64,7 @@ function OnibusPage() {
     }).then(() => {
       buscarAssentos(onibusSelecionado.id);
       buscarReservas();
+      setAssentosSelecionados([]);
     });
   };
 
@@ -70,7 +77,6 @@ function OnibusPage() {
     });
   };
 
-  // --- ESTILOS ---
   const styles = {
     page: {
       backgroundColor: "#f0f2f5",
@@ -126,7 +132,7 @@ function OnibusPage() {
 
   const Header = () => (
     <nav style={styles.navbar}>
-      <h2 style={{ color: "#004a87", margin: 0 }}>Voucher System</h2>
+      <h2 style={{ color: "#004a87", margin: 0 }}>ZTRANSPORTES</h2>
       <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
         <span style={styles.userName}>
           👤 {usuario?.nome} <span style={{ opacity: 0.6 }}>({usuario?.role})</span>
@@ -136,7 +142,6 @@ function OnibusPage() {
     </nav>
   );
 
-  // --- TELA INICIAL (LISTA + MAPA) ---
   if (!onibusSelecionado) {
     return (
       <div style={styles.page}>
@@ -157,7 +162,6 @@ function OnibusPage() {
     );
   }
 
-  // --- TELA DE ASSENTOS ---
   return (
     <div style={styles.page}>
       <Header />
@@ -168,22 +172,11 @@ function OnibusPage() {
 
         <div style={styles.sectionCard}>
           <h3 style={{ marginTop: 0 }}>Passagem para: {onibusSelecionado.nome}</h3>
-          
-          <div style={{ display: "flex", gap: "15px", marginBottom: "20px", fontSize: "13px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-              <div style={{ width: 12, height: 12, backgroundColor: "#fff", border: "1px solid #ccc" }}></div> Livre
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-              <div style={{ width: 12, height: 12, backgroundColor: "#94a3b8" }}></div> Ocupado
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-              <div style={{ width: 12, height: 12, backgroundColor: "#004a87" }}></div> Selecionado
-            </div>
-          </div>
 
           <Assentos
             onibus={onibusSelecionado}
             ocupados={assentosOcupados}
+            selecionados={assentosSelecionados}
             reservar={reservar}
           />
         </div>

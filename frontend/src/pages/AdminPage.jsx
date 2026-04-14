@@ -6,9 +6,10 @@ function AdminPage() {
   const navigate = useNavigate();
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
+  // --- LOGOUT ATUALIZADO PARA MANDAR PRO LOGIN ---
   const logout = () => {
     localStorage.removeItem("usuario");
-    window.location.href = "/";
+    navigate("/login"); // Agora manda direto para o formulário de acesso
   };
 
   useEffect(() => {
@@ -131,24 +132,24 @@ function AdminPage() {
           <button 
             style={styles.btnAction} 
             onClick={() => navigate("/admin/criar-onibus")}
-            onMouseOver={(e) => { e.target.style.backgroundColor = "#004a87"; e.target.style.color = "white"; }}
-            onMouseOut={(e) => { e.target.style.backgroundColor = "white"; e.target.style.color = "#004a87"; }}
+            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "#004a87"; e.currentTarget.style.color = "white"; }}
+            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "white"; e.currentTarget.style.color = "#004a87"; }}
           >
             ➕ Criar Ônibus
           </button>
           <button 
             style={styles.btnAction} 
             onClick={() => navigate("/admin/criar-usuario")}
-            onMouseOver={(e) => { e.target.style.backgroundColor = "#004a87"; e.target.style.color = "white"; }}
-            onMouseOut={(e) => { e.target.style.backgroundColor = "white"; e.target.style.color = "#004a87"; }}
+            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "#004a87"; e.currentTarget.style.color = "white"; }}
+            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "white"; e.currentTarget.style.color = "#004a87"; }}
           >
             👤 Novo Usuário
           </button>
           <button 
             style={styles.btnAction} 
             onClick={() => navigate("/admin/usuarios")}
-            onMouseOver={(e) => { e.target.style.backgroundColor = "#004a87"; e.target.style.color = "white"; }}
-            onMouseOut={(e) => { e.target.style.backgroundColor = "white"; e.target.style.color = "#004a87"; }}
+            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "#004a87"; e.currentTarget.style.color = "white"; }}
+            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "white"; e.currentTarget.style.color = "#004a87"; }}
           >
             ⚙️ Gerenciar Equipe
           </button>
