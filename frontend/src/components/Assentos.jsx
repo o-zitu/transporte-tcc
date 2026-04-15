@@ -10,6 +10,11 @@ function Assentos({ onibus, ocupados, reservar }) {
   
   const colunasRender = [...colunas].reverse();
 
+  // Função para formatar o preço vindo do banco
+  const formatarPreco = (valor) => {
+    return valor ? valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : "R$ 0,00";
+  };
+
   const COR_BORDA_ONIBUS = "#1e293b"; 
   const COR_FUNDO_ONIBUS = "#f8fafc"; 
   const COR_AZUL_SANTA_CRUZ = "#004a87"; 
@@ -70,8 +75,8 @@ function Assentos({ onibus, ocupados, reservar }) {
     poltrona: (num) => {
       const isOcupado = ocupados.includes(num);
       return {
-        width: "44px", // Aumentei levemente para caber o texto do preço
-        height: "44px",
+        width: "46px", // Aumentei um pouquinho mais para o texto do preço não apertar
+        height: "46px",
         borderRadius: "8px", 
         border: isOcupado ? "none" : `2px solid ${COR_AZUL_SANTA_CRUZ}`,
         backgroundColor: isOcupado ? "#94a3b8" : "#ffffff",
@@ -104,7 +109,9 @@ function Assentos({ onibus, ocupados, reservar }) {
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1.1' }}>
                     <span style={{ fontSize: '13px' }}>{col[i]}</span>
                     {!ocupados.includes(col[i]) && (
-                      <span style={{ fontSize: '7px', fontWeight: 'normal', opacity: 0.8 }}>R$ 15,50</span>
+                      <span style={{ fontSize: '7px', fontWeight: 'normal', opacity: 0.8 }}>
+                        {formatarPreco(onibus.precoTicket)}
+                      </span>
                     )}
                   </div>
                 </button>
@@ -122,7 +129,9 @@ function Assentos({ onibus, ocupados, reservar }) {
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1.1' }}>
                     <span style={{ fontSize: '13px' }}>{col[i]}</span>
                     {!ocupados.includes(col[i]) && (
-                      <span style={{ fontSize: '7px', fontWeight: 'normal', opacity: 0.8 }}>R$ 15,50</span>
+                      <span style={{ fontSize: '7px', fontWeight: 'normal', opacity: 0.8 }}>
+                        {formatarPreco(onibus.precoTicket)}
+                      </span>
                     )}
                   </div>
                 </button>
@@ -133,7 +142,7 @@ function Assentos({ onibus, ocupados, reservar }) {
 
         <div style={styles.cabin}>
           <div style={styles.steeringWheel}>
-             <div style={{width: 18, height: 18, border: `2px solid ${COR_BORDA_ONIBUS}`, borderRadius: '50%'}} />
+              <div style={{width: 18, height: 18, border: `2px solid ${COR_BORDA_ONIBUS}`, borderRadius: '50%'}} />
           </div>
         </div>
 
