@@ -15,10 +15,13 @@ public class Onibus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nome;
+    private String origem;
+
+    private String destino;
 
     private LocalTime horarioSaida;
 
     private Integer quantidadeAssentos;
 
+    private Double precoTicket;
 }
