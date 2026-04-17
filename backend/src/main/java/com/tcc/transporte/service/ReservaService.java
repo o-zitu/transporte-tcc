@@ -18,31 +18,36 @@ public class ReservaService {
     }
 
     public Reserva salvarReserva(Reserva reserva) {
+        if (reserva.getId() == null) {
 
-        boolean assentoOcupado =
-                reservaRepository.existsByNumeroAssentoAndOnibusId(
-                        reserva.getNumeroAssento(),
-                        reserva.getOnibus().getId()
-                );
+            boolean assentoOcupado = reservaRepository.existsByNumeroAssentoAndOnibusId(
+                    reserva.getNumeroAssento(),
+                    reserva.getOnibus().getId()
+            );
 
-        if (assentoOcupado) {
-            throw new RuntimeException("Assento já reservado!");
+            if (assentoOcupado) {
+                throw new RuntimeException("Assento já reservado!");
+            }
+
+            List<Reserva> reservasDoOnibus = reservaRepository.findByOnibusId(reserva.getOnibus().getId());
+            boolean usuarioJaPossuiLugar = reservasDoOnibus.stream()
+                    .anyMatch(r -> r.getUsuario().getId().equals(reserva.getUsuario().getId()));
+
+            if (usuarioJaPossuiLugar) {
+                throw new RuntimeException("Você já possui uma reserva para este ônibus!");
+            }
+
+            reserva.setDataReserva(LocalDateTime.now());
+            reserva.setStatus(StatusReserva.ATIVA);
+
+        } else {
+            Reserva reservaExistente = reservaRepository.findById(reserva.getId())
+                    .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
+
+            if (reserva.getDataReserva() == null) {
+                reserva.setDataReserva(reservaExistente.getDataReserva());
+            }
         }
-
-        boolean usuarioJaReservou =
-                reservaRepository.existsByUsuarioIdAndOnibusIdAndStatus(
-                        reserva.getUsuario().getId(),
-                        reserva.getOnibus().getId(),
-                        StatusReserva.ATIVA
-                );
-
-        if (usuarioJaReservou) {
-            throw new RuntimeException("Usuário já possui reserva ativa nesse ônibus!");
-        }
-
-        reserva.setDataReserva(LocalDateTime.now());
-
-        reserva.setStatus(StatusReserva.ATIVA);
 
         return reservaRepository.save(reserva);
     }
@@ -52,11 +57,9 @@ public class ReservaService {
     }
 
     public void cancelarReserva(Long id) {
-
         if (!reservaRepository.existsById(id)) {
             throw new RuntimeException("Reserva não encontrada");
         }
-
         reservaRepository.deleteById(id);
     }
 
@@ -67,6 +70,4 @@ public class ReservaService {
     public List<Reserva> listarPorOnibus(Long id) {
         return reservaRepository.findByOnibusId(id);
     }
-
-
 }
