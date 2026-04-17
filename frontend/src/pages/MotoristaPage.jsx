@@ -3,18 +3,18 @@ import { useNavigate } from "react-router-dom";
 import "../styles/App.css";
 
 function MotoristaPage() {
-  const [onibusLista, setOnibusLista] = useState([]); // Lista para o Select
-  const [idOnibusSelecionado, setIdOnibusSelecionado] = useState(""); // ID do ônibus atual
-  const [reservas, setReservas] = useState([]); // Reservas filtradas
+  const [onibusLista, setOnibusLista] = useState([]); 
+  const [idOnibusSelecionado, setIdOnibusSelecionado] = useState(""); 
+  const [reservas, setReservas] = useState([]); 
   const navigate = useNavigate();
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const usuarioLogado = JSON.parse(localStorage.getItem("usuario"));
 
   const logout = () => {
     localStorage.removeItem("usuario");
     navigate("/login");
   };
 
-  // 1. Busca os ônibus disponíveis para o motorista escolher
+  // 1. Busca os ônibus disponíveis
   useEffect(() => {
     fetch("http://localhost:8080/onibus")
       .then(res => res.json())
@@ -22,12 +22,12 @@ function MotoristaPage() {
       .catch(err => console.error("Erro ao carregar ônibus:", err));
   }, []);
 
-  // 2. Busca as reservas do ônibus selecionado (Usando seu endpoint do Back-end)
+  // 2. Busca as reservas do ônibus selecionado
   const buscarPassageiros = (id) => {
     if (!id) return;
     fetch(`http://localhost:8080/reservas/onibus/${id}`)
       .then(res => res.json())
-      .then(setReservas)
+      .then(dados => setReservas(dados))
       .catch(err => console.error("Erro ao carregar passageiros:", err));
   };
 
@@ -39,19 +39,39 @@ function MotoristaPage() {
 
   // 3. Função para Confirmar o Embarque (Check-in)
   const confirmarEmbarque = (reserva) => {
+    const reservaAtualizada = {
+      id: reserva.id,
+      dataReserva: reserva.dataReserva,
+      numeroAssento: reserva.numeroAssento,
+      status: "CONFIRMADA", 
+      usuario: { id: reserva.usuario.id },
+      onibus: { id: idOnibusSelecionado }
+    };
+
     fetch("http://localhost:8080/reservas", {
-      method: "POST", // O JPA faz update se o objeto tiver ID
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...reserva,
-        status: "CONFIRMADA"
-      })
+      body: JSON.stringify(reservaAtualizada)
     })
-    .then(() => {
-      alert("Embarque confirmado!");
-      buscarPassageiros(idOnibusSelecionado); // Atualiza a lista na tela
+    .then(async (res) => {
+      if (res.ok) {
+        alert("Embarque confirmado!");
+        
+        // Atualiza o estado local para o card mudar de cor e sumir o botão
+        setReservas(prev => prev.map(r => 
+          r.id === reserva.id ? { ...r, status: "CONFIRMADA" } : r
+        ));
+      } else {
+        // Se der erro 400 ou 500, lemos a mensagem de texto do Java
+        const msgErro = await res.text();
+        console.error("Erro do Servidor:", msgErro);
+        alert(`Não foi possível confirmar: ${msgErro}`);
+      }
     })
-    .catch(err => alert("Erro ao confirmar embarque."));
+    .catch(err => {
+      console.error("Erro na requisição:", err);
+      alert("Erro de conexão com o servidor.");
+    });
   };
 
   const styles = {
@@ -69,7 +89,8 @@ function MotoristaPage() {
       justifyContent: "space-between",
       alignItems: "center",
       boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-      borderLeft: `6px solid ${status === "CONFIRMADA" ? "#16a34a" : "#d97706"}` 
+      borderLeft: `6px solid ${status === "CONFIRMADA" ? "#16a34a" : "#d97706"}`,
+      transition: "all 0.3s ease"
     }),
     seatBadge: { backgroundColor: "#004a87", color: "white", padding: "10px 15px", borderRadius: "8px", fontSize: "18px", fontWeight: "bold" },
     btnCheckin: { backgroundColor: "#16a34a", color: "white", border: "none", padding: "10px 20px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" },
@@ -82,7 +103,7 @@ function MotoristaPage() {
       <nav style={styles.navbar}>
         <h2 style={{ color: "#004a87", margin: 0 }}>ZTRANSPORTES - Motorista</h2>
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-          <span>👤 {usuario?.nome}</span>
+          <span>👤 {usuarioLogado?.nome}</span>
           <button onClick={logout} style={{ padding: "8px 16px", backgroundColor: "#fee2e2", color: "#b91c1c", border: "none", borderRadius: "6px", cursor: "pointer" }}>Sair</button>
         </div>
       </nav>
@@ -111,7 +132,13 @@ function MotoristaPage() {
                   <div style={{ textAlign: "left" }}>
                     <span style={styles.label}>Passageiro</span>
                     <span style={styles.value}>{r.usuario?.nome}</span>
-                    <span style={{ fontSize: "12px", color: r.status === "CONFIRMADA" ? "#16a34a" : "#d97706", fontWeight: "bold", display: "block", marginTop: "5px" }}>
+                    <span style={{ 
+                      fontSize: "12px", 
+                      color: r.status === "CONFIRMADA" ? "#16a34a" : "#d97706", 
+                      fontWeight: "bold", 
+                      display: "block", 
+                      marginTop: "5px" 
+                    }}>
                       {r.status === "CONFIRMADA" ? "● EMBARCADO" : "○ AGUARDANDO"}
                     </span>
                   </div>
